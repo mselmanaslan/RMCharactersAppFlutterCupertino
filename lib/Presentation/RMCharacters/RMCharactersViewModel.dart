@@ -17,23 +17,21 @@ class RMCharactersViewModel {
   }, headerTitle: "Rick&Morty\nCharacters");
 
   RMCharactersViewModel() {
-    init();
+
   }
 
-  void init() {
-    fetchCharacters();
-  }
 
-  void fetchCharacters() async {
+
+   fetchCharacters() async {
     apiPageNumber++;
     final fetchedCharacters = await characterService.fetchCharacters(() {
     }, filter, apiPageNumber);
     fetchedCharacters.forEach((character) {
       adaptedCharacters.add(character.AdaptCharacter());
+      print(adaptedCharacters.length);
+
     });
-    adaptedCharacters.forEach((character) {
-      print('Karakter Adı: ${character.id}');
-    });
+
   }
 
 }
