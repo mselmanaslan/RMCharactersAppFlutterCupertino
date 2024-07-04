@@ -20,4 +20,32 @@ class AdaptedCharacter {
     required this.location,
     required this.episode,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'characterId': id,
+      'name': name,
+      'image': image,
+      'status': status,
+      'species': species,
+      'gender': gender,
+      'origin': origin,
+      'location': location,
+      'episodes': episode,
+    };
+  }
+
+  factory AdaptedCharacter.fromMap(Map<String, dynamic> map) {
+    return AdaptedCharacter(
+      id: map['characterId'],
+      name: map['name'],
+      image: map['image'],
+      status: map['status'],
+      species: map['species'],
+      gender: map['gender'],
+      origin: map['origin'],
+      location: map['location'],
+      episode: map['episodes'],
+    );
+  }
 }
