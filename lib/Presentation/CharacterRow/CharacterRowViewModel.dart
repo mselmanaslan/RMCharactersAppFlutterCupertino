@@ -1,23 +1,44 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rmcharactersappfluttercupertino/Model/AdaptedCharacter.dart';
+import 'package:rmcharactersappfluttercupertino/Presentation/FavoriteIcon/FavoriteIconViewModel.dart';
+import '../../Network/Service/DatabaseService.dart';
 
-class CharacterRowViewModel {
+class CharacterRowViewModel with ChangeNotifier {
   AdaptedCharacter character;
   late String statusInfo;
   late Color statusColor;
   late Color genderColor;
-
+  late FavoriteIconViewModel favoriteIconViewModel;
+  late bool isFavorited = false;
 
   CharacterRowViewModel({required this.character}) {
     statusInfo = determineStatusInfo(character.status) + " " +  character.name;
     statusColor = characterStatusColor(character.status);
     genderColor = characterGenderColor(character.gender);
 
+    favoriteIconViewModel = FavoriteIconViewModel(isFavorited: isFavorited, favoriteIconAction: () {
+      toggleFavorite();
+    });
+
+    initFavoriteStatus();
   }
 
+  Future<void> initFavoriteStatus() async {
+    isFavorited = await isCharacterInFavorite(character.id);
+    favoriteIconViewModel.isFavorited = isFavorited;
+    notifyListeners();  // Değişiklikleri dinleyicilere bildirir
+  }
 
+  Future<void> toggleFavorite() async {
+    isFavorited = !isFavorited;
+    await DatabaseService().toggleFavorite(character);
+    favoriteIconViewModel.isFavorited = isFavorited;
+    notifyListeners();  // Değişiklikleri dinleyicilere bildirir
+  }
 
-
+  Future<bool> isCharacterInFavorite(String characterId) async {
+    return await DatabaseService().isCharacterInFavorites(characterId);
+  }
 
   String determineStatusInfo(String status) {
     switch (status) {
