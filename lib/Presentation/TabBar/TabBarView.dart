@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:rmcharactersappfluttercupertino/Presentation/FavoritedCharacters/FavoritedCharactersView.dart';
 import 'package:rmcharactersappfluttercupertino/Presentation/RMCharacters/RMCharactersView.dart';
@@ -11,6 +10,8 @@ class TabBarView extends StatefulWidget {
 }
 
 class _TabBarViewState extends State<TabBarView> {
+  int _currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
@@ -27,6 +28,11 @@ class _TabBarViewState extends State<TabBarView> {
             label: 'Characters',
           ),
         ],
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
       tabBuilder: (BuildContext context, int index) {
         Widget tab;

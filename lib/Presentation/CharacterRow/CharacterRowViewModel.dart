@@ -10,9 +10,11 @@ class CharacterRowViewModel with ChangeNotifier {
   late Color genderColor;
   late FavoriteIconViewModel favoriteIconViewModel;
   late bool isFavorited = false;
+  final Function(AdaptedCharacter character) onFavoriteChanged;
+  final Function(AdaptedCharacter character) onDetailsTapped;
 
-  CharacterRowViewModel({required this.character}) {
-    statusInfo = determineStatusInfo(character.status) + " " +  character.name;
+  CharacterRowViewModel({required this.character, required this.onFavoriteChanged, required this.onDetailsTapped}) {
+    statusInfo = determineStatusInfo(character.status) + " " + character.name;
     statusColor = characterStatusColor(character.status);
     genderColor = characterGenderColor(character.gender);
 
@@ -26,14 +28,21 @@ class CharacterRowViewModel with ChangeNotifier {
   Future<void> initFavoriteStatus() async {
     isFavorited = await isCharacterInFavorite(character.id);
     favoriteIconViewModel.isFavorited = isFavorited;
-    notifyListeners();  // Değişiklikleri dinleyicilere bildirir
+    notifyListeners();
+  }
+
+  Future<void> refreshFavoriteStatus() async {
+    isFavorited = await isCharacterInFavorite(character.id);
+    favoriteIconViewModel.isFavorited = isFavorited;
+    notifyListeners();
   }
 
   Future<void> toggleFavorite() async {
     isFavorited = !isFavorited;
     await DatabaseService().toggleFavorite(character);
     favoriteIconViewModel.isFavorited = isFavorited;
-    notifyListeners();  // Değişiklikleri dinleyicilere bildirir
+    notifyListeners();
+    onFavoriteChanged(character); // Callback çağrısı
   }
 
   Future<bool> isCharacterInFavorite(String characterId) async {

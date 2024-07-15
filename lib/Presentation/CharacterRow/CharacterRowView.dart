@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:rmcharactersappfluttercupertino/Presentation/CharacterRow/CharacterRowViewModel.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/FavoriteIcon/favoriteIconView.dart';
+import 'package:rmcharactersappfluttercupertino/Presentation/FavoriteIcon/FavoriteIconView.dart';
 
 class CharacterRowView extends StatefulWidget {
   final CharacterRowViewModel viewModel;
@@ -28,141 +28,144 @@ class _CharacterRowViewState extends State<CharacterRowView> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<CharacterRowViewModel>(
-      create: (context) => widget.viewModel,
+    return ChangeNotifierProvider<CharacterRowViewModel>.value(
+      value: widget.viewModel,
       child: Consumer<CharacterRowViewModel>(
         builder: (context, viewModel, child) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
-            child: Container(
-              height: 200,
-              decoration: BoxDecoration(
-                color: CupertinoColors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: viewModel.statusColor,
-                    spreadRadius: 0,
-                    blurRadius: 8,
-                    offset: Offset(0, 0),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            viewModel.statusInfo,
-                            style: TextStyle(
-                              color: viewModel.statusColor,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 18,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 4.0),
-                              child: isFavoriteInitialized
-                                  ? FavoriteIconView(viewModel: viewModel.favoriteIconViewModel)
-                                  : CupertinoActivityIndicator(),
-                            ),
-                            SizedBox(height: 14),
-                          ],
-                        ),
-                      ],
+          return GestureDetector(
+            onTap: () => viewModel.onDetailsTapped(viewModel.character),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
+              child: Container(
+                height: 190,
+                decoration: BoxDecoration(
+                  color: CupertinoColors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: viewModel.statusColor,
+                      spreadRadius: 0,
+                      blurRadius: 8,
+                      offset: Offset(0, 0),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 1),
-                    child: Row(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: viewModel.statusColor,
-                              width: 3,
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, right: 15, top: 0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              viewModel.statusInfo,
+                              style: TextStyle(
+                                color: viewModel.statusColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          child: ClipOval(
-                            child: Image.network(
-                              viewModel.character.image,
-                              width: 115,
-                              height: 115,
-                              fit: BoxFit.cover,
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 4.0),
+                                child: isFavoriteInitialized
+                                    ? FavoriteIconView(viewModel: viewModel.favoriteIconViewModel)
+                                    : CupertinoActivityIndicator(),
+                              ),
+                              SizedBox(height: 14),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 1),
+                      child: Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: viewModel.statusColor,
+                                width: 3,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Image.network(
+                                viewModel.character.image,
+                                width: 115,
+                                height: 115,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Species: ",
-                                  style: TextStyle(
-                                    color: CupertinoColors.black,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 17,
-                                  ),
-                                ),
-                                Container(
-                                  constraints: BoxConstraints(
-                                    maxWidth: MediaQuery.of(context).size.width * 0.28,
-                                  ),
-                                  child: Text(
-                                    viewModel.character.species,
+                          SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "Species: ",
                                     style: TextStyle(
-                                      fontWeight: FontWeight.w600,
+                                      color: CupertinoColors.black,
+                                      fontWeight: FontWeight.w500,
                                       fontSize: 17,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 30),
-                            Row(
-                              children: [
-                                Text(
-                                  "Gender:  ",
-                                  style: TextStyle(
-                                    color: CupertinoColors.black,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 17,
-                                  ),
-                                ),
-                                Container(
-                                  constraints: BoxConstraints(
-                                    maxWidth: MediaQuery.of(context).size.width * 0.28,
-                                  ),
-                                  child: Text(
-                                    viewModel.character.gender,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 17,
-                                      color: viewModel.genderColor,
+                                  Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth: MediaQuery.of(context).size.width * 0.28,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
+                                    child: Text(
+                                      viewModel.character.species,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 17,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 40),
-                          ],
-                        ),
-                      ],
+                                ],
+                              ),
+                              SizedBox(height: 30),
+                              Row(
+                                children: [
+                                  Text(
+                                    "Gender:  ",
+                                    style: TextStyle(
+                                      color: CupertinoColors.black,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 17,
+                                    ),
+                                  ),
+                                  Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth: MediaQuery.of(context).size.width * 0.28,
+                                    ),
+                                    child: Text(
+                                      viewModel.character.gender,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 17,
+                                        color: viewModel.genderColor,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 40),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

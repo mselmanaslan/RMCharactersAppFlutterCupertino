@@ -1,6 +1,7 @@
 import 'package:rmcharactersappfluttercupertino/Model/AdaptedCharacter.dart';
 import 'package:rmcharactersappfluttercupertino/Model/ApiCharacter.dart';
 import 'package:rmcharactersappfluttercupertino/Network/Service/CharacterService.dart';
+import 'package:rmcharactersappfluttercupertino/Presentation/CharacterRow/CharacterRowViewModel.dart';
 import 'package:rmcharactersappfluttercupertino/Presentation/Header/HeaderViewModel.dart';
 import '../../Model/Filter.dart';
 
@@ -11,27 +12,30 @@ class RMCharactersViewModel {
   List<AdaptedCharacter> adaptedCharacters = [];
   Filter filter = Filter(name: "", status: "", species: "", gender: "");
 
+  var headerViewModel = HeaderViewModel(
+    isFilterMenuOpen: () {
+      print("testt");
+    },
+    headerTitle: "Rick&Morty\nCharacters",
+  );
 
-  var headerViewModel = HeaderViewModel(isFilterMenuOpen: () {
-    print("testt");
-  }, headerTitle: "Rick&Morty\nCharacters");
+  RMCharactersViewModel();
 
-  RMCharactersViewModel() {
-
-  }
-
-
-
-   fetchCharacters() async {
+  fetchCharacters() async {
     apiPageNumber++;
-    final fetchedCharacters = await characterService.fetchCharacters(() {
-    }, filter, apiPageNumber);
+    final fetchedCharacters = await characterService.fetchCharacters(() {}, filter, apiPageNumber);
     fetchedCharacters.forEach((character) {
       adaptedCharacters.add(character.AdaptCharacter());
       print(adaptedCharacters.length);
-
     });
-
   }
 
+  CharacterRowViewModel createCharacterRowViewModel(AdaptedCharacter character, Function(AdaptedCharacter) onDetailsTapped) {
+    return CharacterRowViewModel(
+      character: character,
+      onFavoriteChanged: (AdaptedCharacter character) {
+
+      }, onDetailsTapped: onDetailsTapped,
+    );
+  }
 }
