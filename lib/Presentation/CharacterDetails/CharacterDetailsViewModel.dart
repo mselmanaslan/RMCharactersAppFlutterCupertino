@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rmcharactersappfluttercupertino/Model/AdaptedCharacter.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/FavoriteIcon/FavoriteIconViewModel.dart';
 import '../../Network/Service/DatabaseService.dart';
+import '../Components/FavoriteIcon/FavoriteIconViewModel.dart';
 
 class CharacterDetailsViewModel with ChangeNotifier {
   AdaptedCharacter character;
