@@ -1,33 +1,65 @@
+import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:rmcharactersappfluttercupertino/Model/AdaptedCharacter.dart';
 import 'package:rmcharactersappfluttercupertino/Model/ApiCharacter.dart';
 import 'package:rmcharactersappfluttercupertino/Network/Service/CharacterService.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/CharacterRow/CharacterRowViewModel.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/Header/HeaderViewModel.dart';
 import '../../Model/Filter.dart';
+import '../Components/CharacterRow/CharacterRowViewModel.dart';
+import '../Components/FilterMenu/FilterMenuViewModel.dart';
+import '../Components/Header/HeaderViewModel.dart';
 
-class RMCharactersViewModel {
+
+class RMCharactersViewModel extends ChangeNotifier {
   var characterService = CharacterService();
   int apiPageNumber = 0;
   List<ApiCharacter> characters = [];
   List<AdaptedCharacter> adaptedCharacters = [];
-  Filter filter = Filter(name: "", status: "", species: "", gender: "");
+  Filter reqFilter = Filter(name: "", status: "", species: "", gender: "");
+  late FilterMenuViewModel filterMenuViewModel;
+  var headerViewModel;
+  bool isFilterMenuOpen = false;
+  bool isLoading = false;
+  Timer? _debounce;
 
-  var headerViewModel = HeaderViewModel(
-    isFilterMenuOpen: () {
-      print("testt");
-    },
-    headerTitle: "Rick&Morty\nCharacters",
-  );
+  RMCharactersViewModel() {
+    filterMenuViewModel = FilterMenuViewModel(
+      isFilterMenuOpen: isFilterMenuOpen,
+      filter: reqFilter,
+      onFilterChanged: (Filter newfilter) {
+        adaptedCharacters.clear();
+        reqFilter = newfilter;
+        notifyListeners();
+        if (_debounce?.isActive ?? false) _debounce?.cancel();
+        _debounce = Timer(const Duration(milliseconds: 500), () {
 
-  RMCharactersViewModel();
+          fetchFilteredCharacters(reqFilter);
+          notifyListeners();
+        });
+      },
+    );
+    headerViewModel = HeaderViewModel(
+      isFilterMenuOpen: toggleFilterMenu,
+      headerTitle: "Rick&Morty\nCharacters",
+    );
+  }
 
-  fetchCharacters() async {
+  fetchCharacters(Filter filter) async {
+    print('Fetching characters with filter: ${filter.gender}');
     apiPageNumber++;
-    final fetchedCharacters = await characterService.fetchCharacters(() {}, filter, apiPageNumber);
-    fetchedCharacters.forEach((character) {
-      adaptedCharacters.add(character.AdaptCharacter());
-      print(adaptedCharacters.length);
-    });
+    isLoading = true;
+    notifyListeners();
+    try {
+      final fetchedCharacters = await characterService.fetchCharacters(() {}, filter, apiPageNumber);
+      fetchedCharacters.forEach((character) {
+        adaptedCharacters.add(character.AdaptCharacter());
+      });
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      isLoading = false;
+      print('Error fetching characters: $e');
+      notifyListeners();
+    }
   }
 
   CharacterRowViewModel createCharacterRowViewModel(AdaptedCharacter character, Function(AdaptedCharacter) onDetailsTapped) {
@@ -37,5 +69,18 @@ class RMCharactersViewModel {
 
       }, onDetailsTapped: onDetailsTapped,
     );
+  }
+
+  void toggleFilterMenu() {
+    isFilterMenuOpen = !isFilterMenuOpen;
+    filterMenuViewModel.isFilterMenuOpen = isFilterMenuOpen;
+    print(filterMenuViewModel.isFilterMenuOpen);
+    notifyListeners();
+  }
+
+  fetchFilteredCharacters(Filter filter) {
+
+    apiPageNumber = 0;
+    fetchCharacters(reqFilter);
   }
 }

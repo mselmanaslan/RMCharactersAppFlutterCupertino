@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/CharacterRow/CharacterRowView.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/CharacterRow/CharacterRowViewModel.dart';
+import 'package:provider/provider.dart';
 import '../../Model/AdaptedCharacter.dart';
 import '../CharacterDetails/CharacterDetailsView.dart';
 import '../CharacterDetails/CharacterDetailsViewModel.dart';
-import '../Header/HeaderView.dart';
+import '../Components/CharacterRow/CharacterRowView.dart';
+import '../Components/FilterMenu/FilterMenuView.dart';
+import '../Components/Header/HeaderView.dart';
 import 'RMCharactersViewModel.dart';
 
 class RMCharactersView extends StatefulWidget {
@@ -35,7 +36,7 @@ class _RMCharactersViewState extends State<RMCharactersView> {
   @override
   void didUpdateWidget(covariant RMCharactersView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _refreshFavoriteStatuses(); // Favori durumlarını kontrol et ve güncelle
+    _refreshFavoriteStatus(); // Favori durumlarını kontrol et ve güncelle
   }
 
   void _scrollListener() {
@@ -48,15 +49,14 @@ class _RMCharactersViewState extends State<RMCharactersView> {
   }
 
   Future<void> _fetchCharactersAndUpdateUI() async {
-    await viewModel.fetchCharacters();
+    await viewModel.fetchCharacters(viewModel.reqFilter);
     setState(() {
       print("setState çalıştı");
     });
   }
 
-
-  Future<void> _refreshFavoriteStatuses() async {
-    for (var characterViewModel in viewModel.adaptedCharacters.map((character) => viewModel.createCharacterRowViewModel(character,(AdaptedCharacter character){}))) {
+  Future<void> _refreshFavoriteStatus() async {
+    for (var characterViewModel in viewModel.adaptedCharacters.map((character) => viewModel.createCharacterRowViewModel(character, (AdaptedCharacter character) {}))) {
       await characterViewModel.refreshFavoriteStatus();
     }
     setState(() {
@@ -66,49 +66,83 @@ class _RMCharactersViewState extends State<RMCharactersView> {
 
   void _showCharacterDetailsSheet(BuildContext context, AdaptedCharacter character) {
     showCupertinoModalBottomSheet(
-        expand: true,
-        context: context,
-        backgroundColor: CupertinoColors.black,
-        builder: (context) =>  CharacterDetailsView(viewModel: CharacterDetailsViewModel(character: character),)
+      expand: true,
+      context: context,
+      backgroundColor: CupertinoColors.black,
+      builder: (context) => CharacterDetailsView(viewModel: CharacterDetailsViewModel(character: character)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: HeaderView(viewModel: viewModel.headerViewModel),
-          ),
-          Expanded(
-            child: Center(
-              child: CupertinoScrollbar(
-                controller: _scrollController,
-                child: ListView.builder(
+    return ChangeNotifierProvider.value(
+      value: viewModel,
+      child: Consumer<RMCharactersViewModel>(
+        builder: (context, viewModel, child) {
+          return CupertinoPageScaffold(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: HeaderView(viewModel: viewModel.headerViewModel),
+                ),
+                FilterMenuView(viewModel: viewModel.filterMenuViewModel),
+                Expanded(child: viewModel.adaptedCharacters.isEmpty
+                ? Center(
+                  child: FutureBuilder(
+                    future: Future.delayed(Duration(seconds: 2)),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CupertinoActivityIndicator();
+                      } else {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Sorry...",
+                                style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 32, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                "No characters found matching\nyour search criteria.\nPlease try adjusting your filters.",
+                                style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 22, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ): CupertinoScrollbar(
                   controller: _scrollController,
-                  padding: EdgeInsets.only(top: 20, bottom: 90),
-                  itemCount: viewModel.adaptedCharacters.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index < viewModel.adaptedCharacters.length) {
-                      final character = viewModel.adaptedCharacters[index];
-                      return CharacterRowView(
-                        viewModel: viewModel.createCharacterRowViewModel(
-                          character,
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: EdgeInsets.only(top: 20, bottom: 90),
+                    itemCount: viewModel.adaptedCharacters.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index < viewModel.adaptedCharacters.length) {
+                        final character = viewModel.adaptedCharacters[index];
+                        return CharacterRowView(
+                          viewModel: viewModel.createCharacterRowViewModel(
+                            character,
                                 (AdaptedCharacter character) {
                               _showCharacterDetailsSheet(context, character);
-                            }),
-                      );
-                    } else {
-                      return CupertinoActivityIndicator(); // Yeni karakterler yüklenene kadar gösterilecek loading indicator
-                    }
-                  },
+                            },
+                          ),
+                        );
+                      } else {
+                        return CupertinoActivityIndicator();
+                      }
+                    },
+                  ),
                 ),
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
