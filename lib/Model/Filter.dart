@@ -1,8 +1,13 @@
 class Filter {
-  final String name;
-  final String status;
-  final String species;
-  final String gender;
+  String name;
+  String status;
+  String species;
+  String gender;
 
-  Filter({required this.name, required this.status, required this.species, required this.gender});
+  Filter({
+    this.name = "",
+    this.status = "",
+    this.species = "",
+    this.gender = "",
+  });
 }
