@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/Header/HeaderViewModel.dart';
+
+import 'HeaderViewModel.dart';
+
 
 class HeaderView extends StatefulWidget {
   final HeaderViewModel viewModel;

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/CharacterRow/CharacterRowViewModel.dart';
 import 'package:rmcharactersappfluttercupertino/Presentation/FavoriteIcon/FavoriteIconView.dart';
+import 'CharacterRowViewModel.dart';
 
 class CharacterRowView extends StatefulWidget {
   final CharacterRowViewModel viewModel;

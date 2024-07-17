@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rmcharactersappfluttercupertino/Model/AdaptedCharacter.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/FavoriteIcon/FavoriteIconViewModel.dart';
-import '../../Network/Service/DatabaseService.dart';
+import '../../../Network/Service/DatabaseService.dart';
+import '../FavoriteIcon/FavoriteIconViewModel.dart';
+
 
 class CharacterRowViewModel with ChangeNotifier {
   AdaptedCharacter character;

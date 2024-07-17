@@ -1,4 +1,3 @@
-import '../../Network/Service/DatabaseService.dart';
 
 class FavoriteIconViewModel {
   bool isFavorited;

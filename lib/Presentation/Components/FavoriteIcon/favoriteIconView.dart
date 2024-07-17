@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:rmcharactersappfluttercupertino/Presentation/FavoriteIcon/FavoriteIconViewModel.dart';
+import 'FavoriteIconViewModel.dart';
 
 class FavoriteIconView extends StatefulWidget {
 
