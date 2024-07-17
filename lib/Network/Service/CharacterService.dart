@@ -6,19 +6,23 @@ import '../../Model/CharacterApiResponse.dart';
 import '../../Model/Filter.dart';
 
 class CharacterService {
-  Future<List<ApiCharacter>> fetchCharacters(void Function() ,Filter filter, int pageNumber) async {
-
+  Future<List<ApiCharacter>> fetchCharacters(void Function() callback, Filter filter, int pageNumber) async {
     final String baseUrl = 'https://rickandmortyapi.com/api/character/';
-    final Uri url = Uri.parse('$baseUrl?page=$pageNumber&name=${filter.name}&status=${filter.status}&species=${filter.species}&gender=${filter.gender}');
+    final Uri url = Uri.parse(
+        '$baseUrl?page=$pageNumber&name=${filter.name ?? ''}&status=${filter.status ?? ''}&species=${filter.species ?? ''}&gender=${filter.gender ?? ''}'
+    );
+
+    print('Base URL: $baseUrl');
+    print('Request URL: $url');
 
     try {
       final response = await http.get(url);
       if (response.statusCode >= 200 && response.statusCode < 300) {
-
         final jsonResponse = json.decode(response.body);
         final responseInfo = CharacterApiResponse.fromJson(jsonResponse);
 
         if (responseInfo.info.pages >= pageNumber) {
+          callback();
           return responseInfo.results;
         } else {
           print('Sayfa sonu...');
